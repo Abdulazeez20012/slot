@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.env
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Telegram Sessions
+*.session
+*.session-journal
+
+# Logs & Debug
+*.txt
+*.log
+
+# Caches e.g. .mypy_cache
+.*_cache/
+
+# Agent internal
+.agent/
+.gemini/

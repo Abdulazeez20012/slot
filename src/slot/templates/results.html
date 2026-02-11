@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Slot{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Job Header -->
+    <div class="glass-card rounded-xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <a href="/"
+                    class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-all text-slate-400">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </a>
+                <h1 class="text-xl font-bold text-white">Job Results</h1>
+                <span class="px-2 py-0.5 rounded text-xs font-mono bg-white/5 text-slate-400">#{{ job_id }}</span>
+            </div>
+            <p class="text-slate-400 text-sm ml-11">
+                {{ job.group_title or job.group_identifier }}
+                {% if job.status == 'running' %}
+                <span class="text-blue-400">• Running...</span>
+                {% elif job.status == 'complete' %}
+                <span class="text-emerald-400">• Completed</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Download Actions -->
+        <div class="flex items-center gap-2 ml-11 md:ml-0">
+            <a href="/download/{{ job_id }}/csv"
+                class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-all flex items-center gap-2 border border-white/5">
+                <i data-lucide="file-text" class="w-4 h-4"></i> CSV
+            </a>
+            <a href="/download/{{ job_id }}/json"
+                class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-all flex items-center gap-2 border border-white/5">
+                <i data-lucide="code" class="w-4 h-4"></i> JSON
+            </a>
+        </div>
+    </div>
+
+    <!-- Progress Card -->
+    <div class="glass-card rounded-xl p-6 relative overflow-hidden">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-slate-300">Progress</span>
+            <span class="text-sm font-mono text-primary-400" id="progress-text">{{ job.progress|default(0) }}
+                members</span>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div id="progress-bar" class="bg-primary-500 h-2 transition-all duration-500 rounded-full relative"
+                style="width: 0%">
+                <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+            </div>
+        </div>
+        <p class="mt-4 text-sm text-slate-400 font-mono" id="status-message">
+            {{ job.message }}
+        </p>
+    </div>
+
+    <!-- Live Members Table -->
+    <div class="bg-slate-900/50 border border-white/5 rounded-xl overflow-hidden backdrop-blur-sm">
+        <div class="px-6 py-4 border-b border-white/5">
+            <h2 class="text-sm font-semibold text-white uppercase tracking-wider">Live Feed</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-400">
+                <thead class="bg-white/5 text-slate-200">
+                    <tr>
+                        <th class="px-6 py-3 font-medium">ID</th>
+                        <th class="px-6 py-3 font-medium">Username</th>
+                        <th class="px-6 py-3 font-medium">Name</th>
+                        <th class="px-6 py-3 font-medium">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5" id="members-table-body">
+                    {% for member in members %}
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-3 font-mono text-xs">{{ member.user_id }}</td>
+                        <td class="px-6 py-3 text-blue-400">
+                            {% if member.username %}@{{ member.username }}{% else %}<span
+                                class="text-slate-600">-</span>{% endif %}
+                        </td>
+                        <td class="px-6 py-3 text-white">{{ member.first_name }} {{ member.last_name or '' }}</td>
+                        <td class="px-6 py-3">
+                            <span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-400 border border-white/5">
+                                {{ member.status.value }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const jobId = "{{ job_id }}";
+    const statusMsg = document.getElementById('status-message');
+    const progressText = document.getElementById('progress-text');
+    const progressBar = document.getElementById('progress-bar');
+
+    // Simple polling
+    setInterval(async () => {
+        try {
+            const res = await fetch(`/api/job/${jobId}`);
+            const data = await res.json();
+
+            if (data.message) statusMsg.textContent = data.message;
+            if (data.progress) {
+                progressText.textContent = data.progress + " members";
+                // Fake progress bar logic for visual effect since we don't always know total
+                const pct = data.total_count ? (data.progress / data.total_count) * 100 : 50;
+                progressBar.style.width = pct + "%";
+            }
+
+            if (data.status === 'complete' || data.status === 'error') {
+                progressBar.classList.remove('animate-pulse');
+                if (data.status === 'complete') progressBar.style.width = "100%";
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }, 2000);
+</script>
+{% endblock %}
