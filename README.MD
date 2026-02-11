@@ -1,20 +1,31 @@
-# Slot - Telegram Member Scraper
+# Slot - Telegram Member Scraper & Multi-Adder
 
-Software designed to scrape and export member IDs from Telegram groups and channels.
+Software designed to scrape and export member IDs from Telegram groups and channels, now featuring a modern Web Dashboard and a safe member addition tool.
 
-## Features
+## 🚀 Key Features
 
-- ✅ Extract members from private/public groups with or without admin privileges
-- ✅ Unlimited exporting of active members
-- ✅ Uses the official Telegram API (MTProto) for compliance and safety
-- ✅ Activity-based filters (online, recently, last seen, etc.)
-- ✅ Multiple export formats: CSV, JSON, XLSX, TXT
+- **✅ Pro Max UI**: A stunning, modern web dashboard built with Tailwind CSS and Glassmorphism.
+- **✅ Member Scraping**: Extract members from private/public groups with or without admin privileges.
+- **✅ Safe Member Adder**: Grow your groups by adding members from other sources with built-in safety delays.
+- **✅ Smart Batching**: Automatically waits between batches to prevent Telegram account limits.
+- **✅ Official Telegram API**: Uses MTProto for maximum compliance and safety.
+- **✅ Activity Filters**: Filter by status (Online, Recently, Week, Month).
+- **✅ Multiple Formats**: Export results to CSV, JSON, XLSX, or TXT.
 
-## Installation
+## 🖥️ Web Dashboard
+
+Slot now features a powerful web interface. To start the dashboard:
+
+```bash
+slot web
+```
+Then visit `http://127.0.0.1:8000` in your browser.
+
+## 📦 Installation
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/Abdulazeez20012/slot.git
 cd slot
 
 # Install dependencies (using pip)
@@ -24,57 +35,26 @@ pip install -e .
 uv pip install -e .
 ```
 
-## Quick Start
+## 🛠️ Usage
 
 ### 1. Get Telegram API Credentials
-
-1. Go to https://my.telegram.org
-2. Log in with your phone number
-3. Click "API Development Tools"
-4. Create a new application
-5. Copy your `api_id` and `api_hash`
+1. Go to [my.telegram.org](https://my.telegram.org)
+2. Log in and click "API Development Tools"
+3. Create a new app and copy your `api_id` and `api_hash`.
 
 ### 2. Authenticate
-
+Use the Web Dashboard OR the CLI:
 ```bash
 slot auth --api-id=YOUR_ID --api-hash=YOUR_HASH
 ```
 
-You'll be prompted to enter your phone number and the verification code.
+### 3. Add Members (New!)
+Transfer members from a source group to your target group safely:
+1. Open the **Add Members** tab in the dashboard.
+2. Enter the Source Group and Target Group.
+3. Set your limits and start the process.
 
-### 3. Scrape Members
-
-```bash
-# Basic scrape
-slot scrape @groupname
-
-# Export to Excel with filters
-slot scrape @groupname -o members -f xlsx --filter=recently
-
-# Limit to 1000 members
-slot scrape @groupname -l 1000
-
-# Get group info only
-slot info @groupname
-```
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `slot auth` | Authenticate with Telegram |
-| `slot scrape <group>` | Scrape members from a group |
-| `slot info <group>` | Get group information |
-| `slot --version` | Show version |
-
-## Export Formats
-
-- **CSV** - Universal spreadsheet format
-- **JSON** - For programmatic use
-- **XLSX** - Excel with styling
-- **TXT** - Simple user ID list
-
-## Filter Options
+## 📊 Filter Options
 
 | Filter | Description |
 |--------|-------------|
@@ -82,33 +62,25 @@ slot info @groupname
 | `--filter=recently` | Active within 2-3 days |
 | `--filter=within_week` | Active within a week |
 | `--filter=within_month` | Active within a month |
-| `--exclude-bots` | Exclude bot accounts (default) |
-| `--include-bots` | Include bot accounts |
 
-## Project Structure
+## 🏗️ Project Structure
 
 ```
 slot/
 ├── src/slot/
-│   ├── __init__.py      # Package init
+│   ├── templates/       # Glassmorphism UI Templates
+│   ├── web.py           # FastAPI Web Server
+│   ├── storage.py       # Job & Result Persistence
+│   ├── scraper.py       # Core Telegram Logic
 │   ├── cli.py           # Command-line interface
-│   ├── config.py        # Configuration management
-│   ├── models.py        # Pydantic data models
-│   ├── scraper.py       # Telegram API integration
-│   ├── filters.py       # Activity-based filters
-│   └── exporters.py     # Export (CSV, JSON, XLSX, TXT)
-├── tests/               # Test suite
-├── pyproject.toml       # Project configuration
-├── .env.example         # Example credentials file
-└── README.md            # This file
+│   └── exporters.py     # Data Export logic
+└── ...
 ```
 
-## Requirements
+## 🔒 Security & Privacy
+- **.env Support**: Keeps your credentials safe.
+- **Encrypted Sessions**: Handles Telegram `.session` files securely.
+- **Compliance**: Adheres to Telegram's flood-wait and rate-limit policies.
 
-- Python 3.11+
-- Telegram account
-- API credentials from my.telegram.org
-
-## License
-
+## 📄 License
 MIT
